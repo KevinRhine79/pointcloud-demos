@@ -1,0 +1,15 @@
+# build artifacts
+
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# macOSS
+.DS_Store
+
+# VS Code (this is optional to ignore?)
+
+.vscode/
