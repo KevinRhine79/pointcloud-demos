@@ -18,7 +18,7 @@ cmake --build build -j
 ./build/pc_view your_cloud.pcd 0.5
 ```
 
-- `pc_view` optional argument: `leaf_size` = voxel size for downsampling (default: 0.5)
+- `pc_view` optional argument: `leaf_size` = voxel size for downsampling (default: `0.5`)
 
 ## Environment
 - Tested on macOS (Apple Silicon) with PCL installed via Homebrew

@@ -7,6 +7,7 @@
 #include <pcl/common/common.h>
 
 int main(int argc, char** argv) {
+    // Ensure command line argument is non-empty
     if (argc < 2) {
         std::cerr << "Usage: pc_stats <file.pcd>\n";
         return 1;
@@ -14,7 +15,9 @@ int main(int argc, char** argv) {
 
     const std::string path = argv[1];
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+
+    // Ensure that a .pcd file is successfully loaded
     if (pcl::io::loadPCDFile<pcl::PointXYZ>(path, *cloud) != 0) {
         std::cerr << "Error: failed to load PCD file: " << path << "\n";
         return 1;
