@@ -5,16 +5,19 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(PCL REQUIRED COMPONENTS common io)
+find_package(PCL REQUIRED COMPONENTS common io filters visualization segmentation)
 
 add_executable(pc_stats apps/pc_stats.cpp)
 target_include_directories(pc_stats PRIVATE ${PCL_INCLUDE_DIRS})
 target_link_libraries(pc_stats PRIVATE ${PCL_LIBRARIES})
 target_compile_definitions(pc_stats PRIVATE ${PCL_DEFINITIONS})
 
-find_package(PCL REQUIRED COMPONENTS common io filters visualization)
-
 add_executable(pc_view apps/pc_view.cpp)
 target_include_directories(pc_view PRIVATE ${PCL_INCLUDE_DIRS})
 target_link_libraries(pc_view PRIVATE ${PCL_LIBRARIES})
 target_compile_definitions(pc_view PRIVATE ${PCL_DEFINITIONS})
+
+add_executable(pc_segmentation apps/pc_segmentation.cpp)
+target_include_directories(pc_segmentation PRIVATE ${PCL_INCLUDE_DIRS})
+target_link_libraries(pc_segmentation PRIVATE ${PCL_LIBRARIES})
+target_compile_definitions(pc_segmentation PRIVATE ${PCL_DEFINITIONS})

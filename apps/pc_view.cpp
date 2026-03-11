@@ -24,8 +24,8 @@ int main(int argc, char** argv) {
     const std::string path = argv[1];
     const float leaf = (argc >= 3) ? std::stof(argv[2]) : 0.5f;
 
-    auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-    if (pcl::io::loadPCDFile<pcl::PointXYZ>(path, *cloud) != 0) {
+    auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+    if (pcl::io::loadPCDFile<pcl::PointXYZRGB>(path, *cloud) != 0) {
         std::cerr << "Error: failed to load PCD file: " << path << "\n";
         return 1;
     }
@@ -35,12 +35,15 @@ int main(int argc, char** argv) {
     int before = cloud->size();
     std::vector<int> idx;
     pcl::removeNaNFromPointCloud(*cloud, *cloud, idx);
-    std::cout << "Removed " << before - cloud->size() << " points.\n";
+    if (before - cloud->size() != 0) {
+        std::cout << "Removed " << before - cloud->size() << " points.\n";
+    }
+    else std::cout << "No NaNs found.\n";
 
     // Downsample:
     std::cout << "Downsampling with leaf size: " << leaf << "\n";
-    auto ds = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-    pcl::VoxelGrid<pcl::PointXYZ> vg;
+    auto ds = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+    pcl::VoxelGrid<pcl::PointXYZRGB> vg;
     vg.setInputCloud(cloud);
     vg.setLeafSize(leaf, leaf, leaf);
     vg.filter(*ds);
@@ -54,14 +57,20 @@ int main(int argc, char** argv) {
     pcl::compute3DCentroid(*ds, c);
 
     //Shift to local coordinates around centroid:
-    auto local = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+    auto local = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
     local->reserve(ds->size());
     for (const auto& p : ds->points) {
-        local->push_back(pcl::PointXYZ(
-            static_cast<float>(p.x - c[0]),
-            static_cast<float>(p.y - c[1]),
-            static_cast<float>(p.z - c[2])
-        ));
+        pcl::PointXYZRGB q;
+
+        q.x = static_cast<float>(p.x - c[0]);
+        q.y = static_cast<float>(p.y - c[1]);
+        q.z = static_cast<float>(p.z - c[2]);
+
+        q.r = p.r;
+        q.g = p.g;
+        q.b = p.b;
+
+        local->push_back(q);
     }
 
     local->width = static_cast<uint32_t>(local->size());
@@ -73,7 +82,8 @@ int main(int argc, char** argv) {
     );
     vis->setBackgroundColor(0,0,0);
 
-    vis->addPointCloud<pcl::PointXYZ>(local, "cloud");
+    pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(local);
+    vis->addPointCloud<pcl::PointXYZRGB>(local, rgb, "cloud");
     vis->setPointCloudRenderingProperties(
         pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud"
     );
